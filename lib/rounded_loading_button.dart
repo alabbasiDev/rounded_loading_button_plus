@@ -24,6 +24,12 @@ class RoundedLoadingButton extends StatefulWidget {
   /// The primary color of the button
   final Color? color;
 
+  /// The borderSide of the button
+  final BorderSide? borderSide;
+
+  /// The gradient colors of the button
+  final Gradient? gradient;
+
   /// The vertical extent of the button.
   final double height;
 
@@ -93,6 +99,8 @@ class RoundedLoadingButton extends StatefulWidget {
     required this.onPressed,
     required this.child,
     this.color = Colors.lightBlue,
+    this.gradient,
+    this.borderSide,
     this.height = 50,
     this.width = 300,
     this.loaderSize = 24.0,
@@ -188,24 +196,36 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
       },
     );
 
+    final elevatedButton = ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        onSurface: widget.disabledColor,
+        side: widget.borderSide,
+        minimumSize: Size(_squeezeAnimation.value, widget.height),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+        ),
+        primary: widget.gradient != null ? Colors.transparent : widget.color,
+        shadowColor: widget.gradient != null ? Colors.transparent : null,
+        elevation: widget.elevation,
+        padding: const EdgeInsets.all(0),
+      ),
+      onPressed: widget.onPressed == null ? null : _btnPressed,
+      child: childStream,
+    );
+
     final _btn = ButtonTheme(
       shape: RoundedRectangleBorder(borderRadius: _borderAnimation.value),
       disabledColor: widget.disabledColor,
       padding: const EdgeInsets.all(0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          onSurface: widget.disabledColor,
-          minimumSize: Size(_squeezeAnimation.value, widget.height),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-          ),
-          primary: widget.color,
-          elevation: widget.elevation,
-          padding: const EdgeInsets.all(0),
-        ),
-        onPressed: widget.onPressed == null ? null : _btnPressed,
-        child: childStream,
-      ),
+      child: widget.gradient != null
+          ? Container(
+              decoration: BoxDecoration(
+                gradient: widget.gradient,
+                borderRadius: BorderRadius.circular(widget.borderRadius),
+              ),
+              child: elevatedButton,
+            )
+          : elevatedButton,
     );
 
     return SizedBox(
